@@ -5,8 +5,8 @@
 <p align=center>Aqara SDK for Rust.</p>
 
 <div align=center>
-  <a href="https://crates.io/crates/aqara-sdk-rust">
-    <img src="https://img.shields.io/crates/v/aqara-sdk-rust.svg" alt="crates.io version">
+  <a href="https://crates.io/crates/aqara">
+    <img src="https://img.shields.io/crates/v/aqara.svg" alt="crates.io version">
   </a>
   <a href="https://crates.io/crates/aqara-sdk-rust">
     <img src="https://img.shields.io/github/repo-size/lvillis/aqara-sdk-rust?style=flat-square&color=328657" alt="crates.io version">
