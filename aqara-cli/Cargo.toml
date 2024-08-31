@@ -20,6 +20,3 @@ path = "src/main.rs"
 [dependencies]
 aqara = { version = "0.1.0", default-features = false, features = ["china"] }
 clap = { version = "4.5.16", default-features = false, features = ["std", "debug"] }
-
-[dev-dependencies]
-aqara = { path = "../aqara", default-features = false, features = ["china"] }
