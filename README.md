@@ -1,10 +1,10 @@
-<div style="text-align: right;">Table of Contents↗️</div>
+<div align=right>Table of Contents↗️</div>
 
-<h1 style="text-align: center;"><code>aqara-sdk-rust</code></h1>
+<h1 align=center><code>aqara-sdk-rust</code></h1>
 
-<p style="text-align: center;">Aqara SDK for Rust.</p>
+<p align=center>Aqara SDK for Rust.</p>
 
-<div style="text-align: center;">
+<div align=center>
   <a href="https://crates.io/crates/aqara">
     <img src="https://img.shields.io/crates/v/aqara.svg" alt="crates.io version">
   </a>
@@ -18,6 +18,5 @@
     <img src="https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg" alt="say thanks">
   </a>
 </div>
-
 
 ---

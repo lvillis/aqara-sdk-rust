@@ -1,8 +1,8 @@
-<div style="text-align: right;">Table of Contents↗️</div>
+<div align=right>Table of Contents↗️</div>
 
-<h1 style="text-align: center;"><code>aqara-cli</code></h1>
+<h1 align=center><code>aqara-cli</code></h1>
 
-<div style="text-align: center;">
+<div align=center>
   <a href="https://crates.io/crates/aqara">
     <img src="https://img.shields.io/crates/v/aqara-cli.svg" alt="crates.io version">
   </a>
