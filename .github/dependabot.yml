@@ -9,7 +9,6 @@ updates:
       timezone: "Asia/Shanghai"
   - package-ecosystem: "cargo"
     directories:
-      - "/"
       - "/aqara"
       - "/aqara-cli"
     schedule:
