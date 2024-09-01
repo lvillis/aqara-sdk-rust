@@ -181,4 +181,18 @@ impl AqaraClient {
         self.send_api_request("query.resource.info", data, true)
             .await
     }
+
+    /// command.device.resource
+    pub async fn command_device_resource(
+        &self,
+        position_id: &str,
+        query_text: &str,
+    ) -> Result<String, Error> {
+        let data = json!({
+            "positionId": position_id,
+            "queryText": query_text
+        });
+        self.send_api_request("command.device.resource", data, true)
+            .await
+    }
 }
