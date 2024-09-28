@@ -195,4 +195,20 @@ impl AqaraClient {
         self.send_api_request("command.device.resource", data, true)
             .await
     }
+
+    /// query.position.info
+    pub async fn query_position_info(
+        &self,
+        parent_position_id: Option<&str>,
+        page_num: Option<i32>,
+        page_size: Option<i32>,
+    ) -> Result<String, Error> {
+        let data = json!({
+        "parentPositionId": parent_position_id.unwrap_or(""),
+        "pageNum": page_num.unwrap_or(1),
+        "pageSize": page_size.unwrap_or(30)
+    });
+        self.send_api_request("query.position.info", data, true).await
+    }
+
 }
