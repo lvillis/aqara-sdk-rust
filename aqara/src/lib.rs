@@ -211,4 +211,27 @@ impl AqaraClient {
         self.send_api_request("query.position.info", data, true).await
     }
 
+    /// query.position.detail
+    /// Queries detailed information for specified positions.
+    ///
+    /// This interface allows querying detailed information for up to 50 specified positions simultaneously.
+    ///
+    /// # Parameters
+    ///
+    /// - `position_ids`: A slice of position IDs to query. Maximum of 50 IDs.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the response body as a `String` if successful, or an `AqaraClientError` otherwise.
+    pub async fn query_position_detail(
+        &self,
+        position_ids: &[&str],
+    ) -> Result<String, Error> {
+
+        let data = json!({
+            "positionIds": position_ids
+        });
+        self.send_api_request("query.position.detail", data, true).await
+    }
+
 }
