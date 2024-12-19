@@ -22,7 +22,8 @@ pub struct AqaraClient {
 
 impl AqaraClient {
     pub fn new(config: AqaraConfig) -> Self {
-        // Use compile-time features to select different interface addresses
+        // 根据编译特性选择不同的接口地址
+        // Select different API endpoints based on compilation features
         let base_url = if cfg!(feature = "china") {
             "https://open-cn.aqara.com/v3.0/open/api"
         } else if cfg!(feature = "usa") {
@@ -54,15 +55,10 @@ impl AqaraClient {
             .collect()
     }
 
-    pub fn generate_signature(
-        &self,
-        nonce: &str,
-        time: &str,
-        include_access_token: bool,
-    ) -> String {
+    pub fn generate_signature(&self, nonce: &str, time: &str, include_access_token: bool) -> String {
         let mut sign_str = String::new();
 
-        // Decide whether to add an Accesstoken as needed
+        // 决定是否加入Accesstoken / Decide whether to include Accesstoken
         if include_access_token && !self.config.access_token.is_empty() {
             sign_str.push_str(&format!("Accesstoken={}&", self.config.access_token));
         }
@@ -76,7 +72,7 @@ impl AqaraClient {
         format!("{:x}", digest)
     }
 
-    pub async fn send_api_request(
+    async fn send_api_request(
         &self,
         intent: &str,
         data: Value,
@@ -84,6 +80,7 @@ impl AqaraClient {
     ) -> Result<String, Error> {
         let nonce = self.generate_nonce();
         let time = format!("{}", chrono::Utc::now().timestamp_millis());
+        let sign = self.generate_signature(&nonce, &time, include_access_token);
 
         let request_body = json!({
             "intent": intent,
@@ -96,28 +93,20 @@ impl AqaraClient {
         debug!("  Keyid: {}", &self.config.key_id);
         debug!("  Nonce: {}", &nonce);
         debug!("  Time: {}", &time);
-        debug!(
-            "  Sign: {}",
-            self.generate_signature(&nonce, &time, include_access_token)
-        );
+        debug!("  Sign: {}", &sign);
         debug!("Request Body: {}", request_body.to_string());
 
-        let mut request = self
-            .client
+        let mut request = self.client
             .post(&self.base_url)
             .header("Appid", &self.config.app_id)
             .header("Keyid", &self.config.key_id)
             .header("Nonce", &nonce)
             .header("Time", &time)
-            .header(
-                "Sign",
-                &self.generate_signature(&nonce, &time, include_access_token),
-            )
+            .header("Sign", &sign)
             .header("Lang", "en")
             .header("Content-Type", "application/json")
             .header("User-Agent", "AqaraSDK/1.0");
 
-        // If you need to include an access_token in the header
         if include_access_token {
             request = request.header("Accesstoken", &self.config.access_token);
         }
@@ -132,7 +121,17 @@ impl AqaraClient {
         }
     }
 
-    /// config.auth.getAuthCode
+    /// 获取授权码 (Get auth code)
+    ///
+    /// intent: config.auth.getAuthCode
+    ///
+    /// # Parameters 参数
+    /// - `account`: 用户账户 / User account
+    /// - `account_type`: 账户类型 / Account type
+    /// - `access_token_validity`: AccessToken有效期 / Validity of the access token (e.g. "7d")
+    ///
+    /// # Returns
+    /// 成功返回字符串 / Returns response string on success
     pub async fn config_auth_get_auth_code(
         &self,
         account: &str,
@@ -148,7 +147,15 @@ impl AqaraClient {
             .await
     }
 
-    /// config.auth.refreshToken
+    /// 刷新Token (Refresh token)
+    ///
+    /// intent: config.auth.refreshToken
+    ///
+    /// # Parameters 参数
+    /// - `refresh_token`: 需要刷新的RefreshToken / The refresh token to be used
+    ///
+    /// # Returns
+    /// 成功返回字符串 / Returns response string on success
     pub async fn config_auth_refresh_token(&self, refresh_token: &str) -> Result<String, Error> {
         let data = json!({
             "refreshToken": refresh_token
@@ -157,7 +164,15 @@ impl AqaraClient {
             .await
     }
 
-    /// query.device.subInfo
+    /// 查询子设备信息 (Query sub device info)
+    ///
+    /// intent: query.device.subInfo
+    ///
+    /// # Parameters 参数
+    /// - `gateway_did`: 网关ID / Gateway DID
+    ///
+    /// # Returns
+    /// 成功返回字符串 / Returns response string on success
     pub async fn query_device_sub_info(&self, gateway_did: &str) -> Result<String, Error> {
         let data = json!({
             "did": gateway_did
@@ -166,7 +181,16 @@ impl AqaraClient {
             .await
     }
 
-    /// query.resource.info
+    /// 查询资源信息 (Query resource info)
+    ///
+    /// intent: query.resource.info
+    ///
+    /// # Parameters 参数
+    /// - `model`: 设备型号 / Device model
+    /// - `resource_id`: 资源ID (可选) / Resource ID (optional)
+    ///
+    /// # Returns
+    /// 成功返回字符串 / Returns response string on success
     pub async fn query_resource_info(
         &self,
         model: &str,
@@ -182,7 +206,16 @@ impl AqaraClient {
             .await
     }
 
-    /// command.device.resource
+    /// 命令设备资源 (Command device resource)
+    ///
+    /// intent: command.device.resource
+    ///
+    /// # Parameters 参数
+    /// - `position_id`: 位置ID / Position ID
+    /// - `query_text`: 命令内容 / Query text
+    ///
+    /// # Returns
+    /// 成功返回字符串 / Returns response string on success
     pub async fn command_device_resource(
         &self,
         position_id: &str,
@@ -196,7 +229,17 @@ impl AqaraClient {
             .await
     }
 
-    /// query.position.info
+    /// 查询位置信息 (Query position info)
+    ///
+    /// intent: query.position.info
+    ///
+    /// # Parameters 参数
+    /// - `parent_position_id`: 父位置ID (可选) / Parent position ID (optional)
+    /// - `page_num`: 页码 (可选) / Page number (optional)
+    /// - `page_size`: 每页数量 (可选) / Page size (optional)
+    ///
+    /// # Returns
+    /// 成功返回字符串 / Returns response string on success
     pub async fn query_position_info(
         &self,
         parent_position_id: Option<&str>,
@@ -204,34 +247,77 @@ impl AqaraClient {
         page_size: Option<i32>,
     ) -> Result<String, Error> {
         let data = json!({
-        "parentPositionId": parent_position_id.unwrap_or(""),
-        "pageNum": page_num.unwrap_or(1),
-        "pageSize": page_size.unwrap_or(30)
-    });
+            "parentPositionId": parent_position_id.unwrap_or(""),
+            "pageNum": page_num.unwrap_or(1),
+            "pageSize": page_size.unwrap_or(30)
+        });
         self.send_api_request("query.position.info", data, true).await
     }
 
-    /// query.position.detail
-    /// Queries detailed information for specified positions.
+    /// 查询指定位置的详细信息 (Query detailed position info)
     ///
-    /// This interface allows querying detailed information for up to 50 specified positions simultaneously.
+    /// intent: query.position.detail
     ///
-    /// # Parameters
-    ///
-    /// - `position_ids`: A slice of position IDs to query. Maximum of 50 IDs.
+    /// # Parameters 参数
+    /// - `position_ids`: 位置ID列表 (最多50个) / A slice of up to 50 position IDs
     ///
     /// # Returns
-    ///
-    /// A `Result` containing the response body as a `String` if successful, or an `AqaraClientError` otherwise.
+    /// 成功返回字符串 / Returns response string on success
     pub async fn query_position_detail(
         &self,
         position_ids: &[&str],
     ) -> Result<String, Error> {
-
         let data = json!({
             "positionIds": position_ids
         });
         self.send_api_request("query.position.detail", data, true).await
     }
 
+    /// 查询固件版本信息 (Query OTA firmware versions)
+    ///
+    /// intent: query.ota.firmware
+    ///
+    /// # Parameters 参数
+    /// - `model`: 设备型号 / Device model
+    ///
+    /// # Returns
+    /// 成功返回字符串 / Returns response string on success
+    pub async fn query_ota_firmware(&self, model: &str) -> Result<String, Error> {
+        let data = json!({
+            "model": model
+        });
+        self.send_api_request("query.ota.firmware", data, true).await
+    }
+
+    /// 升级固件 (Upgrade firmware)
+    ///
+    /// intent: write.ota.upgrade
+    ///
+    /// # Parameters 参数
+    /// - `dids`: 设备ID数组 / Array of device IDs to upgrade
+    ///
+    /// # Returns
+    /// 成功返回字符串 / Returns response string on success
+    pub async fn write_ota_upgrade(&self, dids: &[&str]) -> Result<String, Error> {
+        let data = json!({
+            "dids": dids
+        });
+        self.send_api_request("write.ota.upgrade", data, true).await
+    }
+
+    /// 查询设备升级状态 (Query device upgrade status)
+    ///
+    /// intent: query.ota.upgrade
+    ///
+    /// # Parameters 参数
+    /// - `dids`: 设备ID数组 / Array of device IDs
+    ///
+    /// # Returns
+    /// 成功返回字符串 / Returns response string on success
+    pub async fn query_ota_upgrade(&self, dids: &[&str]) -> Result<String, Error> {
+        let data = json!({
+            "dids": dids
+        });
+        self.send_api_request("query.ota.upgrade", data, true).await
+    }
 }
