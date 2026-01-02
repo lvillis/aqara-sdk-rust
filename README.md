@@ -23,42 +23,43 @@
 
 ## Features
 
-- [ ] Location management interface
-- [ ] Equipment distribution network interface
-- [ ] Device management interface
-- [ ] Device resource interface
-- [ ] Infrared device management interface
-- [ ] Device firmware management interface
-- [ ] Linkage configuration query interface
-- [ ] Automation management interface
-- [ ] Scene management interface
-- [ ] Condition set management interface
+- [x] Auth interface
+- [x] Location management interface
+- [x] Equipment distribution network interface
+- [x] Device management interface
+- [x] Device resource interface
+- [x] Infrared device management interface
+- [x] Device firmware management interface
+- [x] Linkage configuration query interface
+- [x] Automation management interface
+- [x] Scene management interface
+- [x] Condition set management interface
 - [x] Voice control interface
+- [x] Push subscription interface
 
 
 ## Usage
 
 ```toml
 [dependencies]
-aqara = { version="0.1.0", default-features = false, features = ["singapore"] }
+aqara = "0.1.0"
 ```
 
 ```rust
-#[tokio::main]
-async fn main() {
-    let config = AqaraConfig {
-        access_token: "your_access_token".to_string(),
-        app_id: "your_app_id".to_string(),
-        key_id: "your_key_id".to_string(),
-        app_key: "your_app_key".to_string(),
-    };
+use aqara::types::{Credentials, Endpoint};
+use aqara::Client;
 
-    let client = AqaraClient::new(config);
-    let response = client.query_position_info(Some("parent_position_id"), Some(1), Some(30)).await;
-    
-    match response {
-        Ok(data) => println!("Response: {}", data),
-        Err(e) => eprintln!("Error: {}", e),
-    }
+#[tokio::main]
+async fn main() -> Result<(), aqara::Error> {
+    let client = Client::builder(Credentials::new("APP_ID", "KEY_ID", "APP_KEY"))
+        .endpoint(Endpoint::Singapore)
+        .access_token("ACCESS_TOKEN")
+        .build()?;
+
+    let resp = client.positions().list(Default::default()).await?;
+    println!("requestId={} message={}", resp.request_id(), resp.message());
+    println!("result={:?}", resp.result());
+
+    Ok(())
 }
 ```

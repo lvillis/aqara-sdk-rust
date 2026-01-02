@@ -5,21 +5,10 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-      time: "07:00"
-      timezone: "Asia/Shanghai"
+      time: "23:00"
 
   - package-ecosystem: "cargo"
-    directories:
-      - "/aqara"
-      - "/aqara-cli"
-    schedule:
-      interval: "daily"
-      time: "07:00"
-      timezone: "Asia/Shanghai"
-
-  - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "daily"
-      time: "07:00"
-      timezone: "Asia/Shanghai"
+      time: "23:00"

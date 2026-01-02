@@ -16,7 +16,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+    - name: Rustfmt
+      run: cargo fmt --check
+    - name: Clippy
+      run: cargo clippy --workspace --all-targets -- -D warnings -D clippy::panic -D clippy::unwrap_used -D clippy::expect_used -D clippy::todo -D clippy::unimplemented -D clippy::dbg_macro
+    - name: Test
+      run: cargo test --workspace --verbose
+    - name: Doc
+      run: cargo doc --workspace --no-deps
+    - name: Feature matrix (aqara)
+      run: |
+        cargo clippy -p aqara --all-targets --no-default-features --features async,rustls -- -D warnings
+        cargo clippy -p aqara --all-targets --no-default-features --features blocking,rustls -- -D warnings
+        cargo clippy -p aqara --all-targets --no-default-features --features async,native-tls -- -D warnings
+        cargo clippy -p aqara --all-targets --no-default-features --features blocking,native-tls -- -D warnings
+        cargo test -p aqara --no-default-features --features async,rustls
+        cargo test -p aqara --no-default-features --features blocking,rustls
+        cargo test -p aqara --no-default-features --features async,native-tls
+        cargo test -p aqara --no-default-features --features blocking,native-tls
+        cargo test -p aqara --no-default-features --features async,blocking,rustls,tracing,metrics,unstable-raw
