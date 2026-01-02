@@ -42,7 +42,7 @@
 
 ```toml
 [dependencies]
-aqara = "0.1.0"
+aqara = "0.1"
 ```
 
 ```rust
