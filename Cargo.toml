@@ -12,6 +12,14 @@ documentation = "https://docs.rs/aqara"
 readme = "README.md"
 categories = ["api-bindings", "network-programming"]
 keywords = ["aqara", "sdk", "iot"]
+include = [
+  "/Cargo.toml",
+  "/README.md",
+  "/LICENSE",
+  "/CHANGELOG.md",
+  "/src/**",
+  "/examples/**",
+]
 
 [workspace.dependencies]
 http = { version = "1.4.0", default-features = false, features = ["std"] }
